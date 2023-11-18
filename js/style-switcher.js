@@ -12,17 +12,18 @@ window.addEventListener("scroll", () =>{
 
 
 /*------------------- theme colors -------------------  */
-const alternateStyle = document.querySelectorAll(".alternate-style");
 
 function setActiveStyle(color) {
-    alternateStyle.forEach((style) =>{
-        if(color === style.getAttribute("title")){
+    const alternateStyle = document.querySelectorAll(".alternate-style");
+
+    alternateStyle.forEach((style) => {
+        if (color === style.getAttribute("title")) {
             style.removeAttribute("disabled");
+            console.log("clicked");
+        } else {
+            style.setAttribute("disabled", true);
         }
-        else{
-            style.setAttribute("disabled", "true")
-        }
-    })
+    });
 }
 
 /*------------------- dark mode -------------------  */
@@ -33,10 +34,10 @@ dayNight.addEventListener("click", () =>{
     document.body.classList.toggle("dark");
 })
 
-window.addEventListener("load", ()=>{
-    if(document.body.classList.contains("dark")){
+window.addEventListener("load", () => {
+    if (document.body.classList.contains("dark")) {
         dayNight.querySelector("i").classList.add("fa-sun");
+    } else {
+        dayNight.querySelector("i").classList.add("fa-moon");
     }
-    else{
-        dayNight.querySelector("i").classList.add("fa-moon");    }
-})
+});
