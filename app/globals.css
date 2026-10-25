@@ -1,0 +1,213 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-inter: "Inter", system-ui, sans-serif;
+  --font-display: "Inter Tight", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Theme tokens as RGB triplets so Tailwind opacity modifiers keep working */
+  --bg: 10 10 11;
+  --bg-soft: 15 15 18;
+  --bg-card: 21 21 26;
+  --line: rgba(255, 255, 255, 0.08);
+  --ink: 245 245 247;
+  --ink-dim: 161 161 170;
+  --ink-mute: 138 138 148;
+  --accent: 212 255 79;
+  --scroll-thumb: #1f1f24;
+  --scroll-thumb-hover: #2a2a30;
+  --aurora-opacity: 0.35;
+  --aurora-blend: screen;
+  --grain-opacity: 0.06;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: 250 250 247;
+  --bg-soft: 242 242 237;
+  --bg-card: 255 255 255;
+  --line: rgba(10, 10, 11, 0.1);
+  --ink: 10 10 11;
+  --ink-dim: 82 82 91;
+  --ink-mute: 99 99 107;
+  --accent: 67 107 13;
+  --scroll-thumb: #d4d4d8;
+  --scroll-thumb-hover: #a1a1aa;
+  --aurora-opacity: 0.22;
+  --aurora-blend: multiply;
+  --grain-opacity: 0.035;
+  color-scheme: light;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Keep anchored sections clear of the fixed navbar */
+  scroll-padding-top: 24px;
+  background: rgb(var(--bg));
+}
+
+html, body {
+  color: rgb(var(--ink));
+  background: rgb(var(--bg));
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Visible keyboard focus everywhere, never on mouse click */
+:focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: rgb(var(--accent));
+  color: rgb(var(--bg));
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: rgb(var(--bg)); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-[1400px] px-6 sm:px-8 lg:px-14;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-ink-dim font-mono;
+  }
+  .eyebrow::before {
+    content: "";
+    @apply h-px w-8 bg-ink-dim/60;
+  }
+
+  .section-heading {
+    @apply text-section font-display font-semibold tracking-tight text-ink text-balance;
+  }
+
+  .card-border {
+    @apply border border-line bg-bg-card/40 backdrop-blur-sm;
+  }
+
+  .btn {
+    @apply inline-flex items-center gap-2 rounded-full border border-line bg-bg-card/60 px-5 py-3 text-sm font-medium text-ink transition-colors hover:bg-bg-card hover:border-ink/30;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-semibold text-bg transition-transform hover:scale-[1.02] hover:shadow-[0_0_40px_rgb(var(--accent)/0.35)];
+  }
+}
+
+/* Grain overlay */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.85'/></svg>");
+  animation: grain 8s steps(10) infinite;
+}
+
+/* Aurora background */
+.aurora {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+.aurora::before,
+.aurora::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(140px);
+  opacity: var(--aurora-opacity);
+  mix-blend-mode: var(--aurora-blend);
+}
+.aurora::before {
+  width: 60vw;
+  height: 60vw;
+  top: -20vw;
+  left: -10vw;
+  background: radial-gradient(circle, #d4ff4f 0%, transparent 60%);
+  animation: drift1 18s ease-in-out infinite alternate;
+}
+.aurora::after {
+  width: 50vw;
+  height: 50vw;
+  bottom: -15vw;
+  right: -10vw;
+  background: radial-gradient(circle, #7c3aed 0%, transparent 60%);
+  animation: drift2 22s ease-in-out infinite alternate;
+}
+
+@keyframes drift1 {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(8vw,4vw) scale(1.1); }
+}
+@keyframes drift2 {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(-6vw,-6vw) scale(1.15); }
+}
+
+/* Hero entrance — pure CSS so it plays on first paint instead of waiting for hydration */
+.enter-up,
+.enter-left,
+.enter-fade,
+.enter-line {
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+.enter-up { animation-name: enter-up; }
+.enter-left { animation-name: enter-left; }
+.enter-fade { animation-name: enter-fade; }
+.enter-line { animation-name: enter-line; animation-duration: 0.7s; }
+
+@keyframes enter-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes enter-left {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes enter-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes enter-line {
+  from { transform: translateY(110%); }
+  to   { transform: none; }
+}
+
+/* Reveal helpers */
+.mask-fade-b {
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
+.mask-fade-r {
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
